@@ -388,7 +388,7 @@ class SolcastSensor(CoordinatorEntity, SensorEntity):
 
         self.entity_description = entity_description
         self._attr_extra_state_attributes = {}
-        self._attr_unique_id = f"{entity_description.key}"
+        self._attr_unique_id = f"{entry.entry_id}_{entity_description.key}"  # Ensure unique ID per instance
         self._coordinator = coordinator
         self._attr_entity_registry_enabled_default = enabled_by_default
         self._sensor_data = None

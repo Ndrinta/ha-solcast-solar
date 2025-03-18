@@ -37,7 +37,7 @@ NO_ATTRIBUTES = ["api_counter", "api_limit", "lastupdated"]
 class SolcastUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data."""
 
-    def __init__(self, hass: HomeAssistant, solcast: SolcastApi, version: str) -> None:
+    def __init__(self, hass: HomeAssistant, solcast: SolcastApi, version: str, entry_id: str) -> None:
         """Initialise the coordinator.
 
         Public variables at the top, protected variables (those prepended with _ after).
@@ -46,8 +46,10 @@ class SolcastUpdateCoordinator(DataUpdateCoordinator):
             hass (HomeAssistant): The Home Assistant instance.
             solcast (SolcastApi): The Solcast API instance.
             version (str): The integration version from manifest.json.
+            entry_id (str): The entry ID to uniquely identify this instance.
 
         """
+        self.entry_id = entry_id  # Add entry_id to uniquely identify this instance
         self.divisions: int = 0
         self.hass: HomeAssistant = hass
         self.interval_just_passed: dt

@@ -272,9 +272,6 @@ class SolcastSolarFlowHandler(ConfigFlow, domain=DOMAIN):
             FlowResult: The form to show.
 
         """
-        if self._async_current_entries():
-            return self.async_abort(reason="single_instance_allowed")
-
         errors: dict[str, str] = {}
 
         if user_input is not None:
@@ -308,6 +305,9 @@ class SolcastSolarFlowHandler(ConfigFlow, domain=DOMAIN):
                 if status != 200:
                     errors["base"] = message
                 else:
+                    unique_id = f"{DOMAIN}_{user_input[CONF_API_KEY].split(',')[0][-6:]}"  # Use part of the API key for uniqueness
+                    await self.async_set_unique_id(unique_id)
+                    self._abort_if_unique_id_configured()
                     return self.async_create_entry(title=TITLE, data={}, options=options | damp)
 
         solcast_json_exists = Path(f"{self.hass.config.config_dir}/solcast.json").is_file()

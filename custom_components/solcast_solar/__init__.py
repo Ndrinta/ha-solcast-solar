@@ -318,7 +318,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: SolcastConfigEntry) -> b
         case SolcastApiStatus.OK:
             pass
 
-    coordinator = SolcastUpdateCoordinator(hass, solcast, version)
+    coordinator = SolcastUpdateCoordinator(hass, solcast, version, entry.entry_id)
     entry.runtime_data = SolcastData(coordinator=coordinator)
     await coordinator.setup()
     await coordinator.async_config_entry_first_refresh()
@@ -331,7 +331,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: SolcastConfigEntry) -> b
     __log_hard_limit_set(solcast)
 
     hass.data[DOMAIN]["presumed_dead"] = False
-    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = True
+    hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
+        "coordinator": coordinator,
+        "solcast": solcast,
+    }
 
     if not await __check_auto_update_missed(coordinator):
         await __check_stale_start(coordinator)
@@ -621,6 +624,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: SolcastConfigEntry) -> 
     if hass.data[DOMAIN].get("presumed_dead") is not None:
         _LOGGER.debug("Removing presumed dead flag")
         hass.data[DOMAIN].pop("presumed_dead")
+        hass.data[DOMAIN].pop(entry.entry_id)
     return unload_ok
 
 
